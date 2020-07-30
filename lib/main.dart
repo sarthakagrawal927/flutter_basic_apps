@@ -12,6 +12,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var _questionNumber = 0;
+  var _totalScore = 0;
   void _answerQ(int score) {
     setState(() {
       //function tells flutter that the state is changed and it has to rerender
@@ -20,9 +22,15 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _resetQuiz() {
+    setState(() {
+      _questionNumber = 0;
+      _totalScore = 0;
+    });
+  }
+
 //final is runtime constant while const is compile time constant
-  var _questionNumber = 0;
-  var _totalScore = 0;
+
   //creating map instead of class
   final _questions = [
     {
@@ -65,7 +73,7 @@ class _MyAppState extends State<MyApp> {
                 answerQ: _answerQ,
                 questions: _questions,
                 questionNumber: _questionNumber)
-            : Result(),
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
