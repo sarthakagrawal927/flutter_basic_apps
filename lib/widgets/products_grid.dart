@@ -13,8 +13,12 @@ class ProductsGrid extends StatelessWidget {
       // optimizes the list view
       padding: const EdgeInsets.all(10.0),
       itemCount: products.length,
-      itemBuilder: (ctx, i) =>
-          ProductItem(products[i].id, products[i].title, products[i].imageUrl),
+      itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
+        // automatically cleans of the data for you once not used.
+        value: products[i],
+        child:
+            ProductItem(), // when using an existing object use .value provider
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,

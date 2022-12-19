@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_complete_guide/providers/product.dart';
 import 'package:flutter_complete_guide/screens/product_detail_screen.dart';
+import 'package:provider/provider.dart';
 
 class ProductItem extends StatelessWidget {
-  final String id;
-  final String title;
-  final String imageUrl;
-
-  ProductItem(this.id, this.title, this.imageUrl);
-
   @override
   Widget build(BuildContext context) {
+    // when using provider of - the whole widget rebuilds when data changes,
+    // using consumer you can just wrap the component you gonna need to rebuild when the data changes
+    final product = Provider.of<Product>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -17,23 +16,30 @@ class ProductItem extends StatelessWidget {
           onTap: () => {
             Navigator.of(context).pushNamed(
               ProductDetailScreen.routeName,
-              arguments: id,
+              arguments: product.id,
             ),
           },
           child: Image.network(
-            imageUrl,
+            product.imageUrl,
             fit: BoxFit.cover,
           ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
           leading: IconButton(
-            icon: const Icon(Icons.favorite),
+            icon: Consumer<Product>(
+              builder: (context, product, _child) => Icon(
+                  product.isFavorite ? Icons.favorite : Icons.favorite_outline),
+              child: Text(
+                  'Never changes'), // is accessible with child value in builder function
+            ),
             color: Theme.of(context).secondaryHeaderColor,
-            onPressed: () {},
+            onPressed: () {
+              product.toggleFavoriteStatus();
+            },
           ),
           title: Text(
-            title,
+            product.title,
             textAlign: TextAlign.center,
           ),
           trailing: IconButton(

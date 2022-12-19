@@ -11,7 +11,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       // only widgets that are listening to the provider will rebuild
-      create: (ctx) => Products(),
+      create: (ctx) =>
+          Products(), // when building new instance of on object use create
       child: MaterialApp(
         title: 'MyShop',
         theme: ThemeData(
