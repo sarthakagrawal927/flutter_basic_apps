@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/utils/product_dummy_data.dart';
 import './product.dart';
-import 'package:provider/provider.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = DUMMY_PRODUCTS;
 
   List<Product> get items {
     return [..._items]; // copy, not reference
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
   void addProduct() {
