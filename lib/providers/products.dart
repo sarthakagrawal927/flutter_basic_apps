@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_complete_guide/utils/product_dummy_data.dart';
+import 'package:flutter_complete_guide/models/http_exception.dart';
 import './product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -42,17 +42,9 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     try {
-      final response = await http.post(url,
-          body: json.encode({
-            'title': product.title,
-            'imageUrl': product.imageUrl,
-            'description': product.description,
-            'price': product.price,
-            'isFavorite': product.isFavorite,
-          }));
-
+      final response = await http.post(url, body: getJSONObject(product));
       final newProduct = Product(
-          id: json.decode(response.body)['name'],
+          id: json.decode(response.body)['name'], // name of the key
           title: product.title,
           description: product.description,
           price: product.price,
@@ -60,25 +52,43 @@ class Products with ChangeNotifier {
       _items.add(newProduct);
       notifyListeners();
     } catch (err) {
-      print(err);
       throw err;
     }
   }
 
-  void updateProduct(Product newProduct) {
+  Future<void> updateProduct(Product newProduct) async {
     final prodIdx =
         _items.indexWhere((element) => (element.id == newProduct.id));
     if (prodIdx < 0) return;
+    final updateUrl = Uri.parse(
+        'https://shop-app-test-fc197-default-rtdb.firebaseio.com/products/${newProduct.id}.json');
+    await http.patch(updateUrl, body: getJSONObject(newProduct));
     _items[prodIdx] = newProduct;
     notifyListeners();
   }
 
-  void removeProduct(String id) {
-    _items.removeWhere((element) => element.id == id);
+  Future<void> removeProduct(String id) async {
+    final deleteUrl = Uri.parse(
+        'https://shop-app-test-fc197-default-rtdb.firebaseio.com/products/$id.json');
+    final resp = await http.delete(deleteUrl);
+    if (resp.statusCode >= 400) {
+      throw HttpException("Something went wrong").toString();
+    } else
+      _items.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 
   Product findById(String id) {
     return _items.firstWhere((element) => element.id == id);
   }
+}
+
+String getJSONObject(Product product) {
+  return json.encode({
+    'title': product.title,
+    'imageUrl': product.imageUrl,
+    'description': product.description,
+    'price': product.price,
+    'isFavorite': product.isFavorite,
+  });
 }
